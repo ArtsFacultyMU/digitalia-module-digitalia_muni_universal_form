@@ -1,0 +1,9 @@
+name: Universal content form
+description: "Allows using single content type and have separate forms depending on group"
+package: digitalia
+type: module
+core_version_requirement: ^9 || ^10
+configure: digitalia_muni_universal_form.settings
+dependencies:
+  - drupal:islandora
+  - drupal:group
