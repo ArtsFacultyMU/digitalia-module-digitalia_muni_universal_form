@@ -11,7 +11,11 @@ function digitalia_muni_universal_form_form_alter(&$form, \Drupal\Core\Form\Form
 
 	//$config = $this->config('digitalia_muni_universal_form.settings');
 
-	dpm(print_r(array_keys($form), TRUE));
+	//dpm(print_r(array_keys($form), TRUE));
+
+	//dpm($form['#validate']);
+	$form['#validate'][] = 'test_validation_function';
+	//dpm($form['#validate']);
 
 	$allowed_fields = array("field_artefact_id", "field_artefact_category", "field_coll_id", "field_surface_data_presence");
 	$available_fields = array();
@@ -23,7 +27,7 @@ function digitalia_muni_universal_form_form_alter(&$form, \Drupal\Core\Form\Form
 		}
 	}
 
-	dpm(print_r($available_fields, TRUE));
+	//dpm(print_r($available_fields, TRUE));
 
 	// remove allowed fields from available fields
 	foreach ($allowed_fields as $allowed_key) {
@@ -34,7 +38,7 @@ function digitalia_muni_universal_form_form_alter(&$form, \Drupal\Core\Form\Form
 	// rename for clarity
 	$fields_to_remove = $available_fields;
 
-	dpm(print_r($fields_to_remove, TRUE));
+	//dpm(print_r($fields_to_remove, TRUE));
 
 	foreach($fields_to_remove as $removed_field => $_value) {
 		unset($form[$removed_field]);
@@ -43,4 +47,22 @@ function digitalia_muni_universal_form_form_alter(&$form, \Drupal\Core\Form\Form
 	//dpm(print_r(array_keys($form_state->getCompleteForm()), TRUE));
 
 	//dpm(print_r($available_fields, TRUE));
+}
+
+function test_validation_function($form, &$form_state)
+{
+	$required_fields = array("field_artefact_id");
+	dpm(print_r($required_fields, TRUE));
+	dpm(array_keys($form_state->getCompleteForm()['field_artefact_id']));
+
+	foreach ($required_fields as $required_field) {
+		dpm("checking field '$required_field'");
+		dpm($form_state->getValue([$required_field, '0', 'value']));
+		//dpm(print_r($form_state->getValues(), TRUE));
+		if ($form_state->isValueEmpty([$required_field, '0', 'value'])) {
+			//$form_state->setRebuild();
+			dpm("Field '$required_field' can not be empty!");
+			$form_state->setErrorByName($required_field, t("Field '$required_field' can not be empty"));
+		}
+	}
 }

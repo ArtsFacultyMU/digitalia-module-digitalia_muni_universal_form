@@ -61,6 +61,13 @@ class ModuleConfigurationForm extends ConfigFormBase
 			'#default_value' => $config->get('group_field_config'),
 		];
 
+		$form['group_field_required'] = [
+			'#type' => 'textarea',
+			'#title' => $this->t('Required fields'),
+			'#description' => $this->t('Configures required fields for each group. Format is gid::list_of_fields'),
+			'#default_value' => $config->get('group_field_required'),
+		];
+
 		$form['enabled_form_ids'] = [
 			'#type' => 'textarea',
 			'#title' => $this->t('Enabled form IDs'),
@@ -78,6 +85,7 @@ class ModuleConfigurationForm extends ConfigFormBase
 	public function submitForm(array &$form, FormStateInterface $form_state)
 	{
 		$this->config('digitalia_muni_universal_form.settings')->set('group_field_config', $form_state->getValue('group_field_config'));
+		$this->config('digitalia_muni_universal_form.settings')->set('group_field_required', $form_state->getValue('group_field_required'));
 		$this->config('digitalia_muni_universal_form.settings')->set('enabled_form_ids', $form_state->getValue('enabled_form_ids'));
 		$this->config('digitalia_muni_universal_form.settings')->save();
 
