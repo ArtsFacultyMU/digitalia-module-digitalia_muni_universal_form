@@ -11,47 +11,62 @@ function digitalia_muni_universal_form_form_alter(&$form, \Drupal\Core\Form\Form
 		return;
 	}
 
-	$group_config = parseGroupConfiguration();
-
 	$node = \Drupal::routeMatch()->getParameter('node');
+	$user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
 
-	$gids = getGroupIDs($node);
+	$group_config = parseGroupConfiguration();
+	$node_gids = getGroupIDs($node);
+	$user_gids = getGroupIDs($user);
+	$all_gids = \Drupal::entityQuery('group')->accessCheck(FALSE)->execute();
+	$common_gids = array();
 	$allowed_fields = array();
+	$fields_to_remove = array();
 
-	// gather all allowed fields based on group membership of a node
-	foreach ($gids as $gid) {
+
+	foreach($all_gids as $gid) {
+		$common_gids[$gid] = 0;
+	}
+
+
+	foreach ($node_gids as $gid) {
+		$common_gids[$gid] += 1;
+	}
+
+	foreach ($user_gids as $gid) {
+		$common_gids[$gid] += 1;
+	}
+
+	// gather all allowed fields based on group membership of a node and user
+	foreach ($common_gids as $gid => $value) {
+		if ($value < 2) {
+			continue;
+		}
+
 		foreach ($group_config[$gid] as $_index2 => $field_name) {
 			$allowed_fields[$field_name] = 0;
 		}
 	}
 
-
-	$available_fields = array();
-
-	// TODO: check user group membership
 	// find fields
 	foreach (array_keys($form) as $key) {
 		if (str_starts_with($key, "field_")) {
-			$available_fields[$key] = 0;
+			$fields_to_remove[$key] = 0;
 		}
 	}
 
-
 	// remove allowed fields from available fields
 	foreach ($allowed_fields as $allowed_key => $_value) {
-		unset($available_fields[$allowed_key]);
+		unset($fields_to_remove[$allowed_key]);
 	}
 
-
-	// rename for clarity
-	$fields_to_remove = $available_fields;
-
-
+	// hide fields that are not allowed
 	foreach($fields_to_remove as $removed_field => $_value) {
 		$form[$removed_field]['#access'] = FALSE;
 	}
 
-} function parseGroupConfiguration()
+}
+
+function parseGroupConfiguration()
 {
 	$group_config = \Drupal::config('digitalia_muni_universal_form.settings')->get('group_field_config');
 
@@ -61,7 +76,7 @@ function digitalia_muni_universal_form_form_alter(&$form, \Drupal\Core\Form\Form
 	foreach ($lines as $line) {
 		$split = explode("::", $line);
 
-		$fields = explode(",", $split[1]);
+		$fields = explode(",", trim($split[1]));
 
 		$parsed[$split[0]] = $fields;
 	}
@@ -73,7 +88,7 @@ function digitalia_muni_universal_form_form_alter(&$form, \Drupal\Core\Form\Form
 function parseFormIDs()
 {
 	$form_config = \Drupal::config('digitalia_muni_universal_form.settings')->get('enabled_form_ids');
-	$list = explode(",", $form_config);
+	$list = explode(",", trim($form_config));
 	$parsed = array();
 
 	foreach ($list as $form_id) {

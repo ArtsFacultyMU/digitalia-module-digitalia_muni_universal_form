@@ -64,7 +64,7 @@ class ModuleConfigurationForm extends ConfigFormBase
 		$form['enabled_form_ids'] = [
 			'#type' => 'textarea',
 			'#title' => $this->t('Enabled form IDs'),
-			'#description' => $this->t('Selects which forms should be altered'),
+			'#description' => $this->t("Selects which forms should be altered. Use ',' to separate multiple values."),
 			'#default_value' => $config->get('enabled_form_ids'),
 		];
 
