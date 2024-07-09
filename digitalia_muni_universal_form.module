@@ -11,22 +11,19 @@ function digitalia_muni_universal_form_form_alter(&$form, \Drupal\Core\Form\Form
 		return;
 	}
 
-	$node = \Drupal::routeMatch()->getParameter('node');
+	$node = \Drupal::routeMatch()->getParameter("node");
 	$user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
-
 	$group_config = parseGroupConfiguration();
 	$node_gids = getGroupIDs($node);
 	$user_gids = getGroupIDs($user);
-	$all_gids = \Drupal::entityQuery('group')->accessCheck(FALSE)->execute();
+	$all_gids = \Drupal::entityQuery("group")->accessCheck(FALSE)->execute();
 	$common_gids = array();
 	$allowed_fields = array();
 	$fields_to_remove = array();
 
-
 	foreach($all_gids as $gid) {
 		$common_gids[$gid] = 0;
 	}
-
 
 	foreach ($node_gids as $gid) {
 		$common_gids[$gid] += 1;
@@ -61,33 +58,28 @@ function digitalia_muni_universal_form_form_alter(&$form, \Drupal\Core\Form\Form
 
 	// hide fields that are not allowed
 	foreach($fields_to_remove as $removed_field => $_value) {
-		$form[$removed_field]['#access'] = FALSE;
+		$form[$removed_field]["#access"] = FALSE;
 	}
-
 }
 
 function parseGroupConfiguration()
 {
-	$group_config = \Drupal::config('digitalia_muni_universal_form.settings')->get('group_field_config');
-
+	$group_config = \Drupal::config("digitalia_muni_universal_form.settings")->get("group_field_config");
 	$lines = explode("\n", $group_config);
-
 	$parsed = array();
+
 	foreach ($lines as $line) {
 		$split = explode("::", $line);
-
 		$fields = explode(",", trim($split[1]));
-
 		$parsed[$split[0]] = $fields;
 	}
 	
 	return $parsed;
-
 }
 
 function parseFormIDs()
 {
-	$form_config = \Drupal::config('digitalia_muni_universal_form.settings')->get('enabled_form_ids');
+	$form_config = \Drupal::config("digitalia_muni_universal_form.settings")->get("enabled_form_ids");
 	$list = explode(",", trim($form_config));
 	$parsed = array();
 
@@ -100,9 +92,7 @@ function parseFormIDs()
 
 function getGroupIDs($entity)
 {
-
 	$gids = [];
-
 	$group_contents = GroupRelationship::loadByEntity($entity);
 
 	foreach ($group_contents as $group_content) {
