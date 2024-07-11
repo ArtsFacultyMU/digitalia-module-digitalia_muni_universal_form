@@ -40,21 +40,18 @@ class ModuleConfigurationForm extends ConfigFormBase
 		$gids = \Drupal::entityQuery("group")->accessCheck(FALSE)->execute();
 		$groups = Group::loadMultiple($gids);
 
-		foreach ($groups as $group) {
-			dpm($group->id() . ": " . $group->label());
-		}
-
+		// TODO: make field selection easier (checkboxes)
 		$form["group_field_config"] = [
 			"#type" => "textarea",
 			"#title" => $this->t("Group configuration"),
-			"#description" => $this->t("Configures enabled fields for each group. Format is gid::list_of_fields"),
+			"#description" => $this->t("Configures enabled fields for each group. Format is gid::list_of_fields, fields are separated by ',' (comma)."),
 			"#default_value" => $config->get("group_field_config"),
 		];
 
 		$form["enabled_form_ids"] = [
-			"#type" => "textarea",
+			"#type" => "textfield",
 			"#title" => $this->t("Enabled form IDs"),
-			"#description" => $this->t("Selects which forms should be altered. Use ',' to separate multiple values."),
+			"#description" => $this->t("Selects which forms should be altered. Use ',' (comma) to separate multiple values."),
 			"#default_value" => $config->get("enabled_form_ids"),
 		];
 

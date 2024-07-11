@@ -93,6 +93,13 @@ function parseFormIDs()
 function getGroupIDs($entity)
 {
 	$gids = [];
+
+	// when node is created, it is not member of any group
+	if (is_null($entity)) {
+		$group = \Drupal::routeMatch()->getParameter('group');
+		return array($group->id());
+	}
+
 	$group_contents = GroupRelationship::loadByEntity($entity);
 
 	foreach ($group_contents as $group_content) {
