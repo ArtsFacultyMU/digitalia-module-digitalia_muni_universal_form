@@ -39,8 +39,10 @@ function digitalia_muni_universal_form_form_alter(&$form, \Drupal\Core\Form\Form
 			continue;
 		}
 
-		foreach ($group_config[$gid] as $_index2 => $field_name) {
-			$allowed_fields[$field_name] = 0;
+		foreach ($group_config[$gid] as $field_name => $value) {
+			if ($value) {
+				$allowed_fields[$field_name] = 0;
+			}
 		}
 	}
 
@@ -64,27 +66,27 @@ function digitalia_muni_universal_form_form_alter(&$form, \Drupal\Core\Form\Form
 
 function parseGroupConfiguration()
 {
-	$group_config = \Drupal::config("digitalia_muni_universal_form.settings")->get("group_field_config");
-	$lines = explode("\n", $group_config);
+	$config = \Drupal::config("digitalia_muni_universal_form.settings");
+	$node_types = array_keys(\Drupal::service("entity_type.bundle.info")->getAllBundleInfo()["node"]);
 	$parsed = array();
+	$node_type = \Drupal::routeMatch()->getParameter("node")->bundle();
 
-	foreach ($lines as $line) {
-		$split = explode("::", $line);
-		$fields = explode(",", trim($split[1]));
-		$parsed[$split[0]] = $fields;
-	}
-	
-	return $parsed;
+	$group_config = $config->get($node_type . ".groups");
+
+	return $group_config;
 }
 
 function parseFormIDs()
 {
-	$form_config = \Drupal::config("digitalia_muni_universal_form.settings")->get("enabled_form_ids");
-	$list = explode(",", trim($form_config));
+	$config = \Drupal::config("digitalia_muni_universal_form.settings");
+	$node_types = array_keys(\Drupal::service("entity_type.bundle.info")->getAllBundleInfo()["node"]);
 	$parsed = array();
 
-	foreach ($list as $form_id) {
-		$parsed[$form_id] = 0;
+	foreach ($node_types as $node_type) {
+		if ($config->get($node_type . ".enabled")) {
+			$parsed["node_" . $node_type . "_form"] = 0;
+			$parsed["node_" . $node_type . "_edit_form"] = 0;
+		}
 	}
 
 	return $parsed;
