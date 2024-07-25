@@ -2,6 +2,6 @@ digitalia_muni_universal_form.settings:
   path: '/admin/config/system/digitalia_muni_universal_form'
   defaults:
     _form: '\Drupal\digitalia_muni_universal_form\Form\ModuleConfigurationForm'
-    _title: 'Digitalia universal form settings'
+    _title: 'Digitalia Universal Form Settings'
   requirements:
     _permission: 'administer site configuration'

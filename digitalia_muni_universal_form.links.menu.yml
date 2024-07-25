@@ -1,0 +1,5 @@
+digitalia_muni_universal_form.config:
+  title: "Digitalia Universal Form"
+  description: "Configure form for each content type"
+  route_name: digitalia_muni_universal_form.settings
+  parent: system.admin_config_development
