@@ -69,9 +69,22 @@ function parseGroupConfiguration()
 	$config = \Drupal::config("digitalia_muni_universal_form.settings");
 	$node_types = array_keys(\Drupal::service("entity_type.bundle.info")->getAllBundleInfo()["node"]);
 	$parsed = array();
-	$node_type = \Drupal::routeMatch()->getParameter("node")->bundle();
+	$node = \Drupal::routeMatch()->getParameter("node");
 
-	$group_config = $config->get($node_type . ".groups");
+	// node creation page
+	if (is_null($node)) {
+		$current_path = \Drupal::service('path.current')->getPath();
+		$args = explode("/", $current_path);
+		//dpm(print_r($current_path, TRUE));
+		//dpm(print_r($args, TRUE));
+		$type = end(explode(":", end($args)));
+	} else {
+		$type = $node->bundle();
+	}
+
+	//\Drupal::logger("digitalia_muni_universal_form")->debug(is_null($node));
+
+	$group_config = $config->get($type . ".groups");
 
 	return $group_config;
 }
@@ -99,6 +112,11 @@ function getGroupIDs($entity)
 	// when node is created, it is not member of any group
 	if (is_null($entity)) {
 		$group = \Drupal::routeMatch()->getParameter('group');
+
+		if (is_null($group)) {
+			return $gids;
+		}
+
 		return array($group->id());
 	}
 
