@@ -1,0 +1,20 @@
+#digitalia_muni_universal_form.nef:
+#  route_name: view.a3d_content.nef
+#  base_route: entity.node.canonical
+#  title: 'Neofig'
+#  weight: -10
+#digitalia_muni_universal_form.exm:
+#  route_name: view.a3d_content.exm
+#  base_route: entity.node.canonical
+#  title: 'Example'
+#  weight: -9
+#digitalia_muni_universal_form.arf:
+#  route_name: view.a3d_content.arf
+#  base_route: entity.node.canonical
+#  title: 'Artefact'
+#  weight: -8
+
+#digitalia_muni_universal_form.arf:
+#  route_name: view.a3d_local_search.arf
+#  base_route: entity.group.canonical
+#  title: 'Search'

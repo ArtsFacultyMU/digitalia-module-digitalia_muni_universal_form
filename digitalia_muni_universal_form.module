@@ -7,10 +7,54 @@ use Drupal\group\Entity\GroupRelationship;
  */
 function digitalia_muni_universal_form_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id)
 {
-	if (is_null(parseFormIDs()[$form_id])) {
-		return;
+	if (!is_null(parseFormIDs()[$form_id])) {
+		alterNodeForm($form, $form_state, $form_id);
+	}
+}
+
+function parseGroupConfiguration()
+{
+	$config = \Drupal::config("digitalia_muni_universal_form.settings");
+	$node_types = array_keys(\Drupal::service("entity_type.bundle.info")->getAllBundleInfo()["node"]);
+	$parsed = array();
+	$node = \Drupal::routeMatch()->getParameter("node");
+
+	// node creation page
+	if (is_null($node)) {
+		$current_path = \Drupal::service('path.current')->getPath();
+		$args = explode("/", $current_path);
+		//dpm(print_r($current_path, TRUE));
+		//dpm(print_r($args, TRUE));
+		$type = end(explode(":", end($args)));
+	} else {
+		$type = $node->bundle();
 	}
 
+	//\Drupal::logger("digitalia_muni_universal_form")->debug(is_null($node));
+
+	$group_config = $config->get($type . ".groups");
+
+	return $group_config;
+}
+
+function parseFormIDs()
+{
+	$config = \Drupal::config("digitalia_muni_universal_form.settings");
+	$node_types = array_keys(\Drupal::service("entity_type.bundle.info")->getAllBundleInfo()["node"]);
+	$parsed = array();
+
+	foreach ($node_types as $node_type) {
+		if ($config->get($node_type . ".enabled")) {
+			$parsed["node_" . $node_type . "_form"] = 0;
+			$parsed["node_" . $node_type . "_edit_form"] = 0;
+		}
+	}
+
+	return $parsed;
+}
+
+function alterNodeForm(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id)
+{
 	$node = \Drupal::routeMatch()->getParameter("node");
 	$user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
 	$group_config = parseGroupConfiguration();
@@ -58,51 +102,15 @@ function digitalia_muni_universal_form_form_alter(&$form, \Drupal\Core\Form\Form
 		unset($fields_to_remove[$allowed_key]);
 	}
 
+	// don't want to deal with built in title field
+	// ["title"]["#value"] doesn't work for some reason
+	$form["title"]['widget'][0]["value"]["#value"] = "n/a";
+	$form["title"]["#access"] = FALSE;
+
 	// hide fields that are not allowed
 	foreach($fields_to_remove as $removed_field => $_value) {
 		$form[$removed_field]["#access"] = FALSE;
 	}
-}
-
-function parseGroupConfiguration()
-{
-	$config = \Drupal::config("digitalia_muni_universal_form.settings");
-	$node_types = array_keys(\Drupal::service("entity_type.bundle.info")->getAllBundleInfo()["node"]);
-	$parsed = array();
-	$node = \Drupal::routeMatch()->getParameter("node");
-
-	// node creation page
-	if (is_null($node)) {
-		$current_path = \Drupal::service('path.current')->getPath();
-		$args = explode("/", $current_path);
-		//dpm(print_r($current_path, TRUE));
-		//dpm(print_r($args, TRUE));
-		$type = end(explode(":", end($args)));
-	} else {
-		$type = $node->bundle();
-	}
-
-	//\Drupal::logger("digitalia_muni_universal_form")->debug(is_null($node));
-
-	$group_config = $config->get($type . ".groups");
-
-	return $group_config;
-}
-
-function parseFormIDs()
-{
-	$config = \Drupal::config("digitalia_muni_universal_form.settings");
-	$node_types = array_keys(\Drupal::service("entity_type.bundle.info")->getAllBundleInfo()["node"]);
-	$parsed = array();
-
-	foreach ($node_types as $node_type) {
-		if ($config->get($node_type . ".enabled")) {
-			$parsed["node_" . $node_type . "_form"] = 0;
-			$parsed["node_" . $node_type . "_edit_form"] = 0;
-		}
-	}
-
-	return $parsed;
 }
 
 function getGroupIDs($entity)
@@ -128,3 +136,22 @@ function getGroupIDs($entity)
 
 	return $gids;
 }
+
+function sortReturnSorted(&$array)
+{
+  \Drupal::logger("TEST")->debug(print_r($array, TRUE));
+  sort($array);
+  \Drupal::logger("TEST2")->debug(print_r($array, TRUE));
+  return $array;
+}
+
+//function alterComparisonForm(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id)
+//{
+//	$form["platform"] = [
+//		"#type" => "textfield",
+//		"#title" => "Group name",
+//		"#maxlength" => 3,
+//		"#default_value" => ,
+//		"#required" => FALSE,
+//	];
+//}
