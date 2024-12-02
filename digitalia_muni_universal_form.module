@@ -12,12 +12,12 @@ function digitalia_muni_universal_form_form_alter(&$form, \Drupal\Core\Form\Form
 	}
 }
 
-function parseGroupConfiguration()
+function parseGroupConfiguration(&$node)
 {
 	$config = \Drupal::config("digitalia_muni_universal_form.settings");
 	$node_types = array_keys(\Drupal::service("entity_type.bundle.info")->getAllBundleInfo()["node"]);
 	$parsed = array();
-	$node = \Drupal::routeMatch()->getParameter("node");
+	//$node = \Drupal::routeMatch()->getParameter("node");
 
 	// node creation page
 	if (is_null($node)) {
@@ -29,6 +29,8 @@ function parseGroupConfiguration()
 	} else {
 		$type = $node->bundle();
 	}
+
+	//\Drupal::logger("TEST_ALTER_2")->debug($type);
 
 	//\Drupal::logger("digitalia_muni_universal_form")->debug(is_null($node));
 
@@ -53,17 +55,25 @@ function parseFormIDs()
 	return $parsed;
 }
 
-function alterNodeForm(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id)
+function alterNodeForm(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id, $ief_entity = null)
 {
 	$node = \Drupal::routeMatch()->getParameter("node");
 	$user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
-	$group_config = parseGroupConfiguration();
+	$group_config = parseGroupConfiguration($node);
+
+	if ($ief_entity) {
+		$group_config = parseGroupConfiguration($ief_entity);
+	}
+
 	$node_gids = getGroupIDs($node);
 	$user_gids = getGroupIDs($user);
 	$all_gids = \Drupal::entityQuery("group")->accessCheck(FALSE)->execute();
 	$common_gids = array();
 	$allowed_fields = array();
 	$fields_to_remove = array();
+
+	//\Drupal::logger("TEST_ALTER_FUNC")->debug($node->id());
+	//\Drupal::logger("TEST_ALTER_FUNC")->debug(print_r($common_gids, TRUE));
 
 	foreach($all_gids as $gid) {
 		$common_gids[$gid] = 0;
@@ -77,6 +87,8 @@ function alterNodeForm(&$form, \Drupal\Core\Form\FormStateInterface $form_state,
 		$common_gids[$gid] += 1;
 	}
 
+	//\Drupal::logger("TEST_ALTER_FUNC")->debug(print_r($common_gids, TRUE));
+
 	// gather all allowed fields based on group membership of a node and user
 	foreach ($common_gids as $gid => $value) {
 		if ($value < 2) {
@@ -89,6 +101,8 @@ function alterNodeForm(&$form, \Drupal\Core\Form\FormStateInterface $form_state,
 			}
 		}
 	}
+
+	//\Drupal::logger("TEST_ALTER_FUNC")->debug(print_r($allowed_fields, TRUE));
 
 	// find fields
 	foreach (array_keys($form) as $key) {
@@ -143,6 +157,13 @@ function sortReturnSorted(&$array)
   sort($array);
   \Drupal::logger("TEST2")->debug(print_r($array, TRUE));
   return $array;
+}
+
+function debugTestMigration(&$array)
+{
+  \Drupal::logger("TEST_SIZE")->debug(print_r($array, TRUE));
+  \Drupal::logger("TEST_SIZE")->debug(count($array));
+  return count($array);
 }
 
 //function alterComparisonForm(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id)
