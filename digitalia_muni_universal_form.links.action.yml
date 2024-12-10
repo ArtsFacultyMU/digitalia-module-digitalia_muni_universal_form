@@ -1,20 +1,20 @@
-group_relationship.group_term_relate_page:
-  route_name: 'entity.group_relationship.group_term_add_page'
-  title: 'Relate taxonomy term'
-  appears_on:
-    - 'view.a3d_group_terms.a3d_all_terms'
-    - 'view.a3d_group_terms.a3d_platform_terms'
-
-group_relationship.group_term_add_page:
-  route_name: 'entity.group_relationship.group_term_create_page'
-  title: 'Create taxonomy term'
-  appears_on:
-    - 'view.a3d_group_terms.a3d_all_terms'
-    - 'view.a3d_group_terms.a3d_platform_terms'
-
-group_relationship.group_node_create_page:
-  route_name: 'entity.group_relationship.group_node_create_page'
-  title: 'Add new content'
-  appears_on:
-    - 'view.group_nodes.nodes'
-    - 'view.group_nodes.nodes_ordinary'
+#group_relationship.group_term_relate_page:
+#  route_name: 'entity.group_relationship.group_term_add_page'
+#  title: 'Relate taxonomy term'
+#  appears_on:
+#    - 'view.a3d_group_terms.a3d_all_terms'
+#    - 'view.a3d_group_terms.a3d_platform_terms'
+#
+#group_relationship.group_term_add_page:
+#  route_name: 'entity.group_relationship.group_term_create_page'
+#  title: 'Create taxonomy term'
+#  appears_on:
+#    - 'view.a3d_group_terms.a3d_all_terms'
+#    - 'view.a3d_group_terms.a3d_platform_terms'
+#
+#group_relationship.group_node_create_page:
+#  route_name: 'entity.group_relationship.group_node_create_page'
+#  title: 'Add new content'
+#  appears_on:
+#    - 'view.group_nodes.nodes'
+#    - 'view.group_nodes.nodes_ordinary'

@@ -151,20 +151,60 @@ function getGroupIDs($entity)
 	return $gids;
 }
 
-function sortReturnSorted(&$array)
+function sortReturnSorted($array)
 {
-  \Drupal::logger("TEST")->debug(print_r($array, TRUE));
   sort($array);
-  \Drupal::logger("TEST2")->debug(print_r($array, TRUE));
   return $array;
 }
 
-function debugTestMigration(&$array)
+function nestedArrayLength(&$array, $index)
 {
-  \Drupal::logger("TEST_SIZE")->debug(print_r($array, TRUE));
-  \Drupal::logger("TEST_SIZE")->debug(count($array));
+  return count($array[$index]);
+}
+
+function arrayLength($array)
+{
   return count($array);
 }
+
+function arrayExtractEntity($array)
+{
+  $entity_array = array();
+  \Drupal::logger("DEBUG_ARRAY_EXTRACT")->debug(print_r($array, TRUE));
+  return $array["entity"];
+}
+
+
+//function debugMigration($string)
+//{
+//  \Drupal::logger("DEBUG_MIGRATION")->debug($string);
+//  //\Drupal::logger("DEBUG_MIGRATION")->debug(strval($string));
+//  return strval($string);
+//}
+//
+//function debugTestMigrationAfter($array)
+//{
+//  \Drupal::logger("TEST_AFTER")->debug(gettype($array));
+//  \Drupal::logger("TEST_AFTER")->debug(print_r($array, TRUE));
+//  //\Drupal::logger("TEST_SIZE")->debug(count($array));
+//  return $array;
+//}
+//
+//function debugTestMigrationAfter2($array)
+//{
+//  \Drupal::logger("TEST_AFTER_2")->debug(gettype($array));
+//  \Drupal::logger("TEST_AFTER_2")->debug(print_r($array, TRUE));
+//  //\Drupal::logger("TEST_SIZE")->debug(count($array));
+//  return $array;
+//}
+//
+//function debugTestMigration($array)
+//{
+//  \Drupal::logger("TEST_SIZE")->debug(gettype($array));
+//  \Drupal::logger("TEST_SIZE")->debug(print_r($array, TRUE));
+//  //\Drupal::logger("TEST_SIZE")->debug(count($array));
+//  return $array;
+//}
 
 //function alterComparisonForm(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id)
 //{
