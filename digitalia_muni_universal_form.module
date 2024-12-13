@@ -1,6 +1,7 @@
 <?php
 
 use Drupal\group\Entity\GroupRelationship;
+use Drupal\group\Entity\Group;
 
 /**
  * implements hook_form_alter()
@@ -33,8 +34,20 @@ function parseGroupConfiguration(&$node)
 	//\Drupal::logger("TEST_ALTER_2")->debug($type);
 
 	//\Drupal::logger("digitalia_muni_universal_form")->debug(is_null($node));
+	$groups = Group::loadMultiple(\Drupal::entityQuery("group")->accessCheck(TRUE)->execute());
+	$groups_code_id = array();
+
+	foreach($groups as $group) {
+		$groups_code_id[$group->get("field_group_code")->getValue()[0]["value"]] = $group->id();
+	}
+
+	//\Drupal::logger("TEST_ALTER_2")->debug(print_r($groups_code_id, TRUE));
 
 	$group_config = $config->get($type . ".groups");
+	foreach($group_config as $group_code => $settings) {
+		$group_config[$groups_code_id[$group_code]] = $settings;
+		unset($group_config[$group_code]);
+	}
 
 	return $group_config;
 }
@@ -60,6 +73,8 @@ function alterNodeForm(&$form, \Drupal\Core\Form\FormStateInterface $form_state,
 	$node = \Drupal::routeMatch()->getParameter("node");
 	$user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
 	$group_config = parseGroupConfiguration($node);
+
+	\Drupal::logger("DEV_NODE_FORM")->debug(print_r($group_config, TRUE));
 
 	if ($ief_entity) {
 		$group_config = parseGroupConfiguration($ief_entity);

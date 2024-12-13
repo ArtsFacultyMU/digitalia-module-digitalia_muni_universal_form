@@ -55,8 +55,12 @@ class ModuleConfigurationForm extends ConfigFormBase
 		$groups_with_label = array();
 
 		foreach ($groups as $group_type) {
-			$groups_with_label[$group_type->id()] = $group_type->label();
+			\Drupal::logger("DEV_FORM_CODE")->debug($group_type->get("field_group_code")->getValue()[0]["value"]);
+			//$groups_with_label[$group_type->id()] = $group_type->label();
+			$groups_with_label[$group_type->get("field_group_code")->getValue()[0]["value"]] = $group_type->label();
 		}
+
+		//\Drupal::logger("DEV_FORM")->debug(print_r($groups_with_label, TRUE));
 
 		$form["vertical_tabs"] = [
 			"#type" => "vertical_tabs",
@@ -99,6 +103,8 @@ class ModuleConfigurationForm extends ConfigFormBase
 
 				$config_group = $config->get($node_type . ".groups." . $group_id);
 
+				//\Drupal::logger("DEV_FORM")->debug(print_r($config_group, TRUE));
+
 				foreach ($fields_with_label as $field_id => $label) {
 					$form[$node_type]["groups"][$group_id][$field_id] = [
 						"#type" => "checkbox",
@@ -108,6 +114,10 @@ class ModuleConfigurationForm extends ConfigFormBase
 				}
 			}
 		}
+
+		//\Drupal::logger("DEV_FORM")->debug(print_r(array_keys($form["a3d_object"]["groups"]["9"]), TRUE));
+		//\Drupal::logger("DEV_FORM")->debug(print_r(array_keys($form["a3d_object"]["groups"]), TRUE));
+		//\Drupal::logger("DEV_FORM_TITLE")->debug(print_r($form["a3d_object"]["title"], TRUE));
 
 		return parent::buildForm($form, $form_state);
 	}
@@ -120,6 +130,7 @@ class ModuleConfigurationForm extends ConfigFormBase
 		$node_types = array_keys(\Drupal::service("entity_type.bundle.info")->getAllBundleInfo()["node"]);
 		foreach ($node_types as $type) {
 			$this->config("digitalia_muni_universal_form.settings")->set($type, $form_state->getValue($type));
+			//\Drupal::logger("DEV_FORM_2")->debug(print_r($this->config("digitalia_muni_universal_form.settings")->get($type), TRUE));
 		}
 
 		$this->config("digitalia_muni_universal_form.settings")->save();
